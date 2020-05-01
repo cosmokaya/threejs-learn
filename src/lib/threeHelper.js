@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three-orbitcontrols-ts';
 
 const threeHelper = () => {
     var scene = new THREE.Scene();
@@ -46,22 +47,25 @@ const threeHelper = () => {
     //执行渲染操作   指定场景、相机作为参数
     renderer.render(scene, camera);
 
-    let T0 = new Date();
-    const getInterval = () => {
-        let T1 = new Date();//本次时间
-        let t = T1 - T0;//时间差
-        T0 = T1;//把本次时间赋值给上次时间
-        return t;
-    }
+    // let T0 = new Date();
+    // const getInterval = () => {
+    //     let T1 = new Date();//本次时间
+    //     let t = T1 - T0;//时间差
+    //     T0 = T1;//把本次时间赋值给上次时间
+    //     return t;
+    // }
 
 
     // 渲染函数
     function render() {
         renderer.render(scene, camera);//执行渲染操作
-        mesh.rotateY(0.001 * getInterval());//每次绕y轴旋转0.01弧度
+        // mesh.rotateY(0.001 * getInterval());//每次绕y轴旋转0.01弧度
         requestAnimationFrame(render);//请求再次执行渲染函数render
     }
     render();
+
+    new OrbitControls(camera, renderer.domElement);//创建控件对象 var controls =
+    // controls.addEventListener('change', render);//监听鼠标、键盘事件
 };
 
 export default threeHelper;

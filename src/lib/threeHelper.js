@@ -11,8 +11,21 @@ const threeHelper = () => {
     // var geometry = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
     var material = new THREE.MeshLambertMaterial({
         color: 0x0000ff
-    }); //材质对象Material
-    var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    });
+    //材质对象Material
+    //半透明效果
+    // var sphereMaterial = new THREE.MeshLambertMaterial({
+    //     color: 0xff0000,
+    //     opacity: 0.7,
+    //     transparent: true
+    // });
+    //高光效果
+    var sphereMaterial = new THREE.MeshPhongMaterial({
+        color: 0x0000ff,
+        specular: 0x4488ee,
+        shininess: 12
+    });
+    var mesh = new THREE.Mesh(geometry, sphereMaterial); //网格模型对象Mesh
     scene.add(mesh); //网格模型添加到场景中
 
     /**

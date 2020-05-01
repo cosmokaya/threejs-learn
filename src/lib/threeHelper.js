@@ -7,13 +7,47 @@ const threeHelper = () => {
     /**
      * 创建网格模型
      */
-    // var geometry = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
-    var geometry = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
+    var geometry = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
+    // var geometry = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
     var material = new THREE.MeshLambertMaterial({
         color: 0x0000ff
     }); //材质对象Material
     var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
     scene.add(mesh); //网格模型添加到场景中
+
+    /**
+     * 创建2
+     */
+    var geometry2 = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
+    var mesh2 = new THREE.Mesh(geometry2, material);
+    mesh2.position.set(500, 0, 0)
+    scene.add(mesh2);
+
+    /**
+     * 创建3
+     */
+    var geometry3 = new THREE.CylinderGeometry(50, 50, 100, 25); //创建一个立方体几何对象Geometry
+    var mesh3 = new THREE.Mesh(geometry3, material);
+    mesh3.position.set(200, 0, 0)
+    scene.add(mesh3);
+
+    // //长方体 参数：长，宽，高
+    // var geometry = new THREE.BoxGeometry(100, 100, 100);
+    // // 球体 参数：半径60  经纬度细分数40,40
+    // var geometry = new THREE.SphereGeometry(60, 40, 40);
+    // // 圆柱  参数：圆柱面顶部、底部直径50,50   高度100  圆周分段数
+    // var geometry = new THREE.CylinderGeometry(50, 50, 100, 25);
+    // // 正八面体
+    // var geometry = new THREE.OctahedronGeometry(50);
+    // // 正十二面体
+    // var geometry = new THREE.DodecahedronGeometry(50);
+    // // 正二十面体
+    // var geometry = new THREE.IcosahedronGeometry(50);
+    // 辅助坐标系  参数2500表示坐标系大小，可以根据场景大小去设置
+    var axisHelper = new THREE.AxesHelper(2500);
+    scene.add(axisHelper);
+
+
     /**
      * 光源设置
      */

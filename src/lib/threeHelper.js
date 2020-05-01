@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three-orbitcontrols-ts';
+// import { OrbitControls } from 'three-orbitcontrols-ts';
+const OrbitControls = require('three-orbit-controls')(THREE);
 
 const threeHelper = () => {
     var scene = new THREE.Scene();

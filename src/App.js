@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import threeHelper from './lib/threeHelper';
+import ThreeHelper from './lib/threeHelper';
 
 
 function App() {
   useEffect(() => {
-    threeHelper();
+    new ThreeHelper();
   }, [])
   return (
     <div className="App">

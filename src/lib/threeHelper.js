@@ -1,5 +1,16 @@
 import * as THREE from 'three';
 
+class GetInterval {
+    T0 = new Date();
+
+    get() {
+        let T1 = new Date();//本次时间
+        let t = T1 - this.T0;//时间差
+        this.T0 = T1;//把本次时间赋值给上次时间
+        return t;
+    }
+}
+
 class ThreeHelper {
     constructor() {
         this.scene = new THREE.Scene();
@@ -14,13 +25,13 @@ class ThreeHelper {
         this.setCamera();
         this.addRender();
 
-        this.render();
+        this.animate();
 
 
     }
 
     addAmbientLignt() {
-        const ambient = new THREE.AmbientLight(0x444444);
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambient);
     };
 
@@ -34,7 +45,7 @@ class ThreeHelper {
         /**
          * 创建网格模型
          */
-        // var geometry = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
+        // const geometry = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
         const geometry = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
         const material = new THREE.MeshLambertMaterial({
             color: 0x0000ff
@@ -73,13 +84,13 @@ class ThreeHelper {
 
 
 
+    interval = new GetInterval();
     // 渲染函数
-    render() {
-        console.log(this.renderer);
+    animate() {
+        requestAnimationFrame(() => this.animate());//请求再次执行渲染函数render
         this.renderer.render(this.scene, this.camera);//执行渲染操作
-        // console.log(getInterval()());
-        this.mesh.rotateY(0.01);//每次绕y轴旋转0.01弧度
-        requestAnimationFrame(() => this.render());//请求再次执行渲染函数render
+        this.mesh.rotateY(0.001 * this.interval.get());//每次绕y轴旋转0.01弧度
+        this.mesh.rotation.x += 0.01;
     }
 
 }

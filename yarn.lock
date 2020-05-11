@@ -9873,6 +9873,18 @@ text-table@0.2.0, text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
+three-orbit-controls@^82.1.0:
+  version "82.1.0"
+  resolved "https://registry.yarnpkg.com/three-orbit-controls/-/three-orbit-controls-82.1.0.tgz#11a7f33d0a20ecec98f098b37780f6537374fab4"
+  integrity sha1-EafzPQog7OyY8Jizd4D2U3N0+rQ=
+
+three-trackballcontrols-ts@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/three-trackballcontrols-ts/-/three-trackballcontrols-ts-0.2.1.tgz#a222e236358459d28025901cf33758292c23363b"
+  integrity sha512-gwbYN+oMUvXaq5/hvjPYzvKuGgwDbVVssDzKfohomABGm8gwkTEhBUgdgTG4BL/ekGQnB+/vdjIhTe/7pxk/kg==
+  dependencies:
+    three "^0.115.0"
+
 three@^0.115.0:
   version "0.115.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.115.0.tgz#540d800c381b9da2334c024f0fbe4d23f84eb05e"

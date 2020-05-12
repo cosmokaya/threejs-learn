@@ -1,6 +1,6 @@
 import * as Three from 'three';
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 class GetInterval {
@@ -54,6 +54,17 @@ class ThreeHelper {
         // this.addShape();
         // this.addShape2();
         // this.addShape3();
+        // this.addExtrudeGeometry();
+
+        //8.texture
+        this.addTextureGeo();
+        var geometry = new Three.PlaneGeometry(204, 102);
+        const texture = new ImageLoader().load('earth.jpg');
+
+        var material = new MeshLambertMaterial({
+            map: texture
+        });
+        this.scene.add(new Mesh(geometry, material));
 
         this.addCamera();
         this.addRender();
@@ -62,8 +73,56 @@ class ThreeHelper {
 
         this.animate();
     }
+    //8.
+    addTextureGeo() {
+
+        // var geometry = new Three.PlaneGeometry(204, 102);
+        // var loader = new ImageLoader();
+        // loader.load('earth.jpg', (texture) => {
+        //     debugger
+        //     var material = new MeshLambertMaterial({
+        //         map: texture
+        //     });
+        //     this.scene.add(new Mesh(geometry, material));
+        // });
+    }
 
     //7.
+    addExtrudeGeometry() {
+        var shape = new Shape();
+        /**四条直线绘制一个矩形轮廓*/
+        // shape.moveTo(0, 0);//起点
+        // shape.lineTo(0, 100);//第2点
+        // shape.lineTo(100, 100);//第3点
+        // shape.lineTo(100, 0);//第4点
+        // shape.lineTo(0, 0);//第5点
+
+        shape.moveTo(0, 0);//起点
+        shape.lineTo(0, 10);//第2点
+        shape.lineTo(10, 10);//第3点
+        shape.lineTo(10, 0);//第4点
+        shape.lineTo(0, 0);//第5点
+
+        var curve = new Three.CatmullRomCurve3([
+            new Three.Vector3(-10, -50, -50),
+            new Three.Vector3(10, 0, 0),
+            new Three.Vector3(8, 50, 50),
+            new Three.Vector3(-5, 0, 100)]);
+        var geometry = new ExtrudeBufferGeometry(shape, {
+            amount: 120,//拉伸长度
+            extrudePath: curve,
+            steps: 50//扫描方向细分数
+            // bevelEnabled:false//无倒角
+        });
+
+
+        var material = new Three.PointsMaterial({
+            color: 0x0000ff,
+            // size: 5.0//点对象像素尺寸
+        });//材质对象
+        this.scene.add(new Mesh(geometry, material));
+    }
+
     //shp中间挖空
     addShape3() {
         var shape = new Shape();
@@ -74,7 +133,7 @@ class ThreeHelper {
         shape.lineTo(0, 0);
 
         var hole = new Path();
-        hole.arc(50,50,40,0,2*Math.PI);//圆弧
+        hole.arc(50, 50, 40, 0, 2 * Math.PI);//圆弧
         // hole.moveTo(20, 20);//起点
         // hole.lineTo(20, 80);//第2点
         // hole.lineTo(80, 80);//第3点

@@ -1,6 +1,6 @@
 import * as Three from 'three';
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 class GetInterval {
@@ -50,7 +50,10 @@ class ThreeHelper {
         // this.addCurvePath();
         // this.addTubeGeometry();
         // this.addTubeGeometryFromCurvePath();
-        this.addLatheGeometry();
+        // this.addLatheGeometry();
+        // this.addShape();
+        // this.addShape2();
+        // this.addShape3();
 
         this.addCamera();
         this.addRender();
@@ -61,6 +64,80 @@ class ThreeHelper {
     }
 
     //7.
+    //shp中间挖空
+    addShape3() {
+        var shape = new Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(0, 100);
+        shape.lineTo(100, 100);
+        shape.lineTo(100, 0);
+        shape.lineTo(0, 0);
+
+        var hole = new Path();
+        hole.arc(50,50,40,0,2*Math.PI);//圆弧
+        // hole.moveTo(20, 20);//起点
+        // hole.lineTo(20, 80);//第2点
+        // hole.lineTo(80, 80);//第3点
+        // hole.lineTo(80, 20);//第4点
+        // hole.lineTo(20, 20);//第5点
+
+        shape.holes.push(hole);
+        var geometry = new ShapeGeometry(shape, 30);
+        let material = new Three.MeshBasicMaterial({
+            color: 0xff0000,
+            side: Three.DoubleSide,
+            // wireframe: true
+        });
+        //线条模型对象
+        var tube = new Mesh(geometry, material);
+        this.scene.add(tube);
+    }
+    //添加shape2样式
+    addShape2() {
+        // 圆弧与直线连接
+        var shape = new Shape(); //Shape对象
+        var R = 50;
+        // 绘制一个半径为R、圆心坐标(0, 0)的半圆弧
+        shape.absarc(0, 0, R, 0, Math.PI);
+        //从圆弧的一个端点(-R, 0)到(-R, -200)绘制一条直线
+        shape.lineTo(-R, -200);
+        // 绘制一个半径为R、圆心坐标(0, -200)的半圆弧
+        shape.absarc(0, -200, R, Math.PI, 2 * Math.PI);
+        //从圆弧的一个端点(R, -200)到(-R, -200)绘制一条直线
+        shape.lineTo(R, 0);
+        var geometry = new ShapeGeometry(shape, 30);
+        let material = new Three.MeshBasicMaterial({
+            color: 0xff0000,
+            side: Three.DoubleSide,
+            // wireframe: true
+        });
+        //线条模型对象
+        var tube = new Mesh(geometry, material);
+        this.scene.add(tube);
+    }
+    //添加shape样式
+    addShape() {
+        var points = [
+            new Vector2(-50, -50),
+            new Vector2(-60, 0),
+            new Vector2(0, 50),
+            new Vector2(60, 0),
+            new Vector2(50, -50),
+            new Vector2(-50, -50),
+        ]
+
+        var shp = new Shape(points);
+        shp.absarc(0, 0, 100, 0, 2 * Math.PI);
+        var geometry = new ShapeGeometry(shp, 25);
+        let material = new Three.MeshBasicMaterial({
+            color: 0xff0000,
+            side: Three.DoubleSide,
+            wireframe: true
+        });
+        //线条模型对象
+        var tube = new Mesh(geometry, material);
+        this.scene.add(tube);
+    }
     //添加旋转模型
     addLatheGeometry() {
         var points = [

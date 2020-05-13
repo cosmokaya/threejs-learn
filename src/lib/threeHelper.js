@@ -1,6 +1,6 @@
 import * as Three from 'three';
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 class GetInterval {
@@ -58,13 +58,8 @@ class ThreeHelper {
 
         //8.texture
         this.addTextureGeo();
-        var geometry = new Three.PlaneGeometry(204, 102);
-        const texture = new ImageLoader().load('earth.jpg');
-
-        var material = new MeshLambertMaterial({
-            map: texture
-        });
-        this.scene.add(new Mesh(geometry, material));
+        // this.addImageLoader();
+        // this.addGeometryForMaterialIndex();
 
         this.addCamera();
         this.addRender();
@@ -74,17 +69,68 @@ class ThreeHelper {
         this.animate();
     }
     //8.
-    addTextureGeo() {
+    addGeometryForMaterialIndex() {
+        let geometry = new BoxGeometry(100, 100, 100);
+        let material1 = new MeshLambertMaterial({ color: 0x0000ff });
+        let texture = new TextureLoader().load('earth.jpg');
+        //阵列
+        texture.wrapS = Three.RepeatWrapping;
+        texture.wrapT = Three.RepeatWrapping;
+        texture.repeat.set(2, 2);
+        //旋转
+        texture.rotation = Math.PI / 2;
+        texture.center.set(0.5, 0.5);
 
-        // var geometry = new Three.PlaneGeometry(204, 102);
-        // var loader = new ImageLoader();
-        // loader.load('earth.jpg', (texture) => {
-        //     debugger
-        //     var material = new MeshLambertMaterial({
-        //         map: texture
-        //     });
-        //     this.scene.add(new Mesh(geometry, material));
-        // });
+        //偏移
+        texture.offset = new Vector2(0.1, 0.2);
+        // this.texture = texture;
+        let material2 = new MeshLambertMaterial({
+            map: texture,
+            // transparent: true
+        });
+
+        let mesh = new Mesh(geometry, [material1, material2, material2, material2, material2, material2]);
+        this.scene.add(mesh);
+    }
+    addTextureGeo() {
+        let geometry = new Three.SphereGeometry(60, 25, 25);
+        // let geometry = new Three.PlaneGeometry(204, 102, 4, 4);
+        let texture = new TextureLoader().load('earth.jpg');
+        texture.wrapS = Three.RepeatWrapping;
+        texture.wrapT = Three.RepeatWrapping;
+        // uv两个方向纹理重复数量
+        texture.repeat.set(1, 1);
+        this.texture = texture;
+        let material = new MeshLambertMaterial({
+            map: this.texture,
+            side: DoubleSide
+        });
+        this.scene.add(new Mesh(geometry, material));
+
+        //改变uv坐标
+        // geometry.faceVertexUvs[0].forEach(ele => {
+        //     ele.forEach(vector2 => vector2.set(0.3, 0.3))
+        // })
+        var t0 = new Vector2(0, 1); //图片左下角
+        var t1 = new Vector2(0, 0); //图片右下角
+        var t2 = new Vector2(1, 0); //图片右上角
+        var t3 = new Vector2(1, 1); //图片左上角
+        var uv1 = [t0, t1, t3]; //选中图片一个三角区域像素——用于映射到一个三角面
+        var uv2 = [t1, t2, t3]; //选中图片一个三角区域像素——用于映射到一个三角面
+        // 设置第五、第六个三角形面对应的纹理坐标
+        geometry.faceVertexUvs[0][4] = uv1
+        geometry.faceVertexUvs[0][5] = uv2
+    }
+
+    addImageLoader() {
+        let geometry = new Three.SphereGeometry(60, 25, 25);
+        let image = new ImageLoader().load('earth.jpg');
+        let texture = new Texture(image);
+        texture.needsUpdate = true;
+        let material = new MeshLambertMaterial({
+            map: texture
+        });
+        this.scene.add(new Mesh(geometry, material));
     }
 
     //7.
@@ -753,6 +799,7 @@ class ThreeHelper {
         this.renderer.render(this.scene, this.camera);//执行渲染操作
         // this.mesh.rotateY(0.001 * this.interval.get());//每次绕y轴旋转0.01弧度
         // this.mesh.rotation.x += 0.01;
+        // this.texture.offset.x -= 0.002
     }
 
 }

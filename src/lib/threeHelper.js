@@ -1,6 +1,6 @@
 import * as Three from 'three';
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 class GetInterval {
@@ -57,9 +57,14 @@ class ThreeHelper {
         // this.addExtrudeGeometry();
 
         //8.texture
-        this.addTextureGeo();
+        //this.addTextureGeo();
         // this.addImageLoader();
         // this.addGeometryForMaterialIndex();
+        // this.addVideoTexture();
+        // this.addNormalTexture();
+        // this.addGlobalNormalTexture();
+        // this.addWallNormalTexture();
+        this.addEnvMap();
 
         this.addCamera();
         this.addRender();
@@ -69,6 +74,60 @@ class ThreeHelper {
         this.animate();
     }
     //8.
+    addEnvMap() {
+        let geometry = new BoxGeometry(100, 140, 140);
+        let cubeTexture = new CubeTextureLoader().load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']);
+        let material = new MeshPhongMaterial({
+            // envMap: cubeTexture
+        });
+        this.scene.add(new Mesh(geometry, material));
+        this.scene.background = cubeTexture;
+    }
+    addWallNormalTexture() {
+        let geometry = new BoxGeometry(100, 140, 140);
+        let texture = new TextureLoader().load('brick_diffuse.jpg');
+        let textureBump = new TextureLoader().load('brick_bump.jpg');
+        let material = new MeshPhongMaterial({
+            map: texture,
+            bumpMap: textureBump
+        });
+        this.scene.add(new Mesh(geometry, material));
+    }
+    addGlobalNormalTexture() {
+        let geometry = new SphereGeometry(100, 40, 40);
+        let texture = new TextureLoader().load('earth_atmos.jpg');
+        let textureNormal = new TextureLoader().load('earth_normal.jpg');
+        let material = new MeshPhongMaterial({
+            map: texture,
+            normalMap: textureNormal
+        });
+        this.scene.add(new Mesh(geometry, material));
+    }
+    addNormalTexture() {
+        let texture = new TextureLoader().load('3_256.jpg');
+        let material = new MeshPhongMaterial({
+            normalMap: texture,
+            normalScale: new Vector2(3, 3),
+            color: 0x0000ff,
+        });
+
+        let geometry = new BoxGeometry(100, 100, 100);
+        this.scene.add(new Mesh(geometry, material));
+    }
+    addVideoTexture() {//视频贴图
+        let video = document.createElement('video');
+        video.src = 'movie.ogv';
+        video.loop = true;
+        video.autoplay = 'autoplay';
+        let texture = new VideoTexture(video);
+        texture.needsUpdate = true;
+        var geometry = new Three.PlaneGeometry(108, 71); //矩形平面
+        var material = new Three.MeshPhongMaterial({
+            map: texture, // 设置纹理贴图
+        }); //材质对象Material
+        var mesh = new Three.Mesh(geometry, material); //网格模型对象Mesh
+        this.scene.add(mesh); //网格模型添加到场景中
+    }
     addGeometryForMaterialIndex() {
         let geometry = new BoxGeometry(100, 100, 100);
         let material1 = new MeshLambertMaterial({ color: 0x0000ff });
@@ -743,7 +802,7 @@ class ThreeHelper {
     }
 
     addAxisHelper() {
-        const axisHelper = new Three.AxisHelper(250);
+        const axisHelper = new Three.AxesHelper(250);
         this.scene.add(axisHelper);
     }
 

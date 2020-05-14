@@ -1,5 +1,5 @@
 import * as Three from 'three';
-import { Tween } from 'es6-tween'
+import { Tween, autoPlay, Easing } from 'es6-tween'
 import { TrackballControls } from 'three-trackballcontrols-ts';
 import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
@@ -826,23 +826,11 @@ class ThreeHelper {
         this.camera.lookAt(new Three.Vector3(0, 0, 0));
         this.camera.position.set(10, 10, 25);
 
-        // var tween = new Tween(this.camera.position);
-        // tween.to({ x: 1000 }, 10000);
+        setTimeout(() => {
+            this.cameraCon({ x: 200, y: 300, z: 100 }, 3000).start();
+        }, 0)
 
-        // Tween.to(
-        //     this.camera.position,  //指明控制的属性
-        //     2, //动画时间
-        //     { x: 1000, y: 1000, z: 500, delay: 0 } //需要移动的距离
-        // );
 
-        let coords = { x: 0, y: 0 };
-        let tween = new Tween(coords)
-            .to({ x: 100, y: 100 }, 1000)
-            .on('update', ({ x, y }) => {
-                console.log(`The values is x: ${x} and y: ${y}`);
-            })
-            .start();
-        console.log(tween);
 
         window.onresize = () => {
             // 重置渲染器输出画布canvas尺寸
@@ -879,7 +867,20 @@ class ThreeHelper {
         this.controls.maxDistance = 1000;
     }
 
-
+    cameraCon(p, time = 6000) {
+        autoPlay(true);
+        var tween1 = new Tween(this.camera.position)
+            .to(p, time || 200000)
+            .easing(Easing.Quadratic.InOut);
+        var update = ({ x, y, z }) => {
+            this.camera.position.set(x, y, z);
+        };
+        console.log(tween1);
+        tween1.on('update', update)
+            .on('start', () => { this.controls.enabled = false })
+            .on('complete', () => { this.controls.enabled = true });//COMPLETE
+        return tween1;
+    }
 
     interval = new GetInterval();
     // 渲染函数

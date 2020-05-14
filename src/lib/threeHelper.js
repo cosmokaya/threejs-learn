@@ -1,7 +1,9 @@
 import * as Three from 'three';
+import { Tween } from 'es6-tween'
 import { TrackballControls } from 'three-trackballcontrols-ts';
 import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
+
 
 class GetInterval {
     T0 = new Date();
@@ -823,6 +825,34 @@ class ThreeHelper {
         this.camera = new Three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.lookAt(new Three.Vector3(0, 0, 0));
         this.camera.position.set(10, 10, 25);
+
+        // var tween = new Tween(this.camera.position);
+        // tween.to({ x: 1000 }, 10000);
+
+        // Tween.to(
+        //     this.camera.position,  //指明控制的属性
+        //     2, //动画时间
+        //     { x: 1000, y: 1000, z: 500, delay: 0 } //需要移动的距离
+        // );
+
+        let coords = { x: 0, y: 0 };
+        let tween = new Tween(coords)
+            .to({ x: 100, y: 100 }, 1000)
+            .on('update', ({ x, y }) => {
+                console.log(`The values is x: ${x} and y: ${y}`);
+            })
+            .start();
+
+        window.onresize = () => {
+            // 重置渲染器输出画布canvas尺寸
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            // 全屏情况下：设置观察范围长宽比aspect为窗口宽高比
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            // 渲染器执行render方法的时候会读取相机对象的投影矩阵属性projectionMatrix
+            // 但是不会每渲染一帧，就通过相机的属性计算投影矩阵(节约计算资源)
+            // 如果相机的一些属性发生了变化，需要执行updateProjectionMatrix ()方法更新相机的投影矩阵
+            this.camera.updateProjectionMatrix();
+        }
     }
 
 
@@ -856,6 +886,7 @@ class ThreeHelper {
         this.controls.update();
         requestAnimationFrame(() => this.animate());//请求再次执行渲染函数render
         this.renderer.render(this.scene, this.camera);//执行渲染操作
+        // Tween.update();
         // this.mesh.rotateY(0.001 * this.interval.get());//每次绕y轴旋转0.01弧度
         // this.mesh.rotation.x += 0.01;
         // this.texture.offset.x -= 0.002

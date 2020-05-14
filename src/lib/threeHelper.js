@@ -842,6 +842,7 @@ class ThreeHelper {
                 console.log(`The values is x: ${x} and y: ${y}`);
             })
             .start();
+        console.log(tween);
 
         window.onresize = () => {
             // 重置渲染器输出画布canvas尺寸

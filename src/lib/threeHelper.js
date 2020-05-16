@@ -1,7 +1,7 @@
 import * as Three from 'three';
 import { Tween, autoPlay, Easing } from 'es6-tween'
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader, SpriteMaterial, Sprite, PlaneGeometry, AudioListener, Audio, AudioLoader, AudioAnalyser } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 
@@ -66,7 +66,14 @@ class ThreeHelper {
         // this.addNormalTexture();
         // this.addGlobalNormalTexture();
         // this.addWallNormalTexture();
-        this.addEnvMap();
+        // this.addEnvMap();
+
+        //10.sprite
+        this.addTrees();
+        this.addRains();
+
+        //13.audio
+        this.addBgMusic();
 
         this.addCamera();
         this.addRender();
@@ -75,6 +82,87 @@ class ThreeHelper {
 
         this.animate();
     }
+    13.
+    addBgMusic() {
+        let listener = new AudioListener();
+        let audio = new Audio(listener);
+
+        new AudioLoader().load('1.mp3', (audioBuffer) => {
+            audio.setBuffer(audioBuffer);
+            audio.setLoop(true);
+            audio.setVolume(1);
+            audio.play();
+            this.analyser = new AudioAnalyser(audio, 256);
+        });
+        this.scene.add(audio);
+
+        this.group = new Group();
+        let N = 128; //控制音频分析器返回频率数据数量
+        for (let i = 0; i < N / 2; i++) {
+            var box = new BoxGeometry(10, 100, 10); //创建一个立方体几何对象
+            var material = new MeshPhongMaterial({
+                color: 0x0000ff
+            }); //材质对象
+            var mesh = new Mesh(box, material); //网格模型对象
+            // 长方体间隔20，整体居中
+            mesh.position.set(20 * i - N / 2 * 10, 200, 0)
+            this.group.add(mesh)
+        }
+        this.scene.add(this.group)
+    }
+
+
+
+    //10.
+    addTrees() {
+        let texture = new TextureLoader().load('tree.png');
+        let material = new SpriteMaterial({
+            map: texture
+        });
+
+        for (let index = 0; index < 100; index++) {
+            let mesh = new Sprite(material);
+            this.scene.add(mesh);
+            let x = Math.random() - 0.5;
+            let z = Math.random() - 0.5;
+            mesh.scale.set(100, 100, 1);
+            mesh.position.set(x * 1000, 50, z * 1000);
+
+        }
+
+        //addGround
+        let materialG = new MeshLambertMaterial({
+            color: 0x777700,
+            side: DoubleSide
+        });
+
+        let geometry = new PlaneGeometry(1000, 1000);
+        this.scene.add(new Mesh(geometry, materialG));
+        geometry.rotateX(-Math.PI / 2);
+
+    }
+
+    addRains() {
+        let texture = new TextureLoader().load('rain.png');
+        let material = new SpriteMaterial({
+            map: texture
+        });
+        this.rainGroup = new Group();
+        for (let index = 0; index < 14000; index++) {
+            let mesh = new Sprite(material);
+            this.rainGroup.add(mesh);
+            let x = Math.random() - 0.5;
+            let y = Math.random();
+            let z = Math.random() - 0.5;
+            mesh.scale.set(3, 3, 1);
+            mesh.position.set(x * 1000, 1000 * y, z * 1000);
+
+        }
+
+        this.scene.add(this.rainGroup);
+
+    }
+
     //8.
     addEnvMap() {
         let geometry = new BoxGeometry(100, 140, 140);
@@ -822,13 +910,15 @@ class ThreeHelper {
         /**
          * 透视相机设置
          */
-        this.camera = new Three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new Three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
         this.camera.lookAt(new Three.Vector3(0, 0, 0));
-        this.camera.position.set(10, 10, 25);
+        this.camera.position.set(100, 100, 250);
 
-        setTimeout(() => {
-            this.cameraCon({ x: 200, y: 300, z: 100 }, 3000).start();
-        }, 0)
+
+        //fly
+        // setTimeout(() => {
+        //     this.cameraCon({ x: 200, y: 300, z: 100 }, 3000).start();
+        // }, 0)
 
 
 
@@ -858,13 +948,13 @@ class ThreeHelper {
         //执行渲染操作   指定场景、相机作为参数
         this.renderer.render(this.scene, this.camera);
 
-
     }
     addControls() {
         this.controls = new OrbitControls(this.camera);
         // this.controls = new TrackballControls(this.camera, this.renderer.domElement);
-        this.controls.minDistance = 210;
-        this.controls.maxDistance = 1000;
+        // this.controls.minDistance = 10;
+        this.controls.maxDistance = 5000;
+        this.controls.update();
     }
 
     cameraCon(p, time = 6000) {
@@ -892,6 +982,24 @@ class ThreeHelper {
         // this.mesh.rotateY(0.001 * this.interval.get());//每次绕y轴旋转0.01弧度
         // this.mesh.rotation.x += 0.01;
         // this.texture.offset.x -= 0.002
+
+        this.rainGroup.children.forEach(rain => {
+            rain.position.y -= 1;
+            if (rain.position.y < 0) {
+                rain.position.setY(1000);
+            }
+        });
+
+        if (this.analyser) {
+            // 获得频率数据N个
+            var arr = this.analyser.getFrequencyData();
+            // console.log(arr);
+            // 遍历组对象，每个网格子对象设置一个对应的频率数据
+            this.group.children.forEach((elem, index) => {
+                elem.scale.y = arr[index] / 80
+                elem.material.color.r = arr[index] / 200;
+            });
+        }
     }
 
 }

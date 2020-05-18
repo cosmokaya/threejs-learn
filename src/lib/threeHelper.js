@@ -1,7 +1,7 @@
 import * as Three from 'three';
 import { Tween, autoPlay, Easing } from 'es6-tween'
 import { TrackballControls } from 'three-trackballcontrols-ts';
-import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader, SpriteMaterial, Sprite, PlaneGeometry, AudioListener, Audio, AudioLoader, AudioAnalyser } from 'three';
+import { Object3D, Mesh, Group, Line, Geometry, Vector3, LineCurve, Vector2, CatmullRomCurve3, Points, CurvePath, LineBasicMaterial, TubeGeometry, LineCurve3, LatheGeometry, Shape, ShapeGeometry, Path, ExtrudeBufferGeometry, ImageLoader, MeshLambertMaterial, TextureLoader, Texture, DoubleSide, BoxGeometry, VideoTexture, MeshPhongMaterial, SphereGeometry, CubeTextureLoader, SpriteMaterial, Sprite, PlaneGeometry, AudioListener, Audio, AudioLoader, AudioAnalyser, KeyframeTrack, AnimationClip, AnimationMixer } from 'three';
 const OrbitControls = require('three-orbit-controls')(Three);
 
 
@@ -72,8 +72,12 @@ class ThreeHelper {
         this.addTrees();
         this.addRains();
 
+        //11.animate
+        this.addAnimate();
+
         //13.audio
         this.addBgMusic();
+        //
 
         this.addCamera();
         this.addRender();
@@ -82,7 +86,32 @@ class ThreeHelper {
 
         this.animate();
     }
-    13.
+    //11.
+    addAnimate() {
+        let material = new MeshLambertMaterial({
+            color: 0x0000ff
+        });
+        let box = new BoxGeometry(100, 10, 10);
+        let boxMesh = new Mesh(box, material);
+        boxMesh.name = 'box1';
+        let sphere = new SphereGeometry(30, 40, 40);
+        let sphereMesh = new Mesh(sphere, material);
+        sphereMesh.name = 'sphere1';
+        let group = new Group();
+        group.add(boxMesh, sphereMesh);
+        group.position.setY(500);
+        this.scene.add(group);
+
+        var positionTrack = new KeyframeTrack('box1.position', [0, 10], [0, 0, 0, 0, -500, 0]);
+        var colorTrack = new KeyframeTrack('box1.material.color', [0, 10], [0, 0, 1, 1, 1, 0]);
+        let clip = new AnimationClip('test', 10, [positionTrack, colorTrack]);
+
+        this.mixer = new AnimationMixer(group);
+        let action = this.mixer.clipAction(clip);
+        action.play();
+    }
+
+    //13.
     addBgMusic() {
         let listener = new AudioListener();
         let audio = new Audio(listener);
@@ -96,7 +125,8 @@ class ThreeHelper {
         });
         this.scene.add(audio);
 
-        this.group = new Group();
+        //添加音频分析器
+        this.groupAnalyser = new Group();
         let N = 128; //控制音频分析器返回频率数据数量
         for (let i = 0; i < N / 2; i++) {
             var box = new BoxGeometry(10, 100, 10); //创建一个立方体几何对象
@@ -106,9 +136,9 @@ class ThreeHelper {
             var mesh = new Mesh(box, material); //网格模型对象
             // 长方体间隔20，整体居中
             mesh.position.set(20 * i - N / 2 * 10, 200, 0)
-            this.group.add(mesh)
+            this.groupAnalyser.add(mesh)
         }
-        this.scene.add(this.group)
+        this.scene.add(this.groupAnalyser)
     }
 
 
@@ -973,6 +1003,7 @@ class ThreeHelper {
     }
 
     interval = new GetInterval();
+    clock = new Three.Clock();
     // 渲染函数
     animate() {
         this.controls.update();
@@ -995,10 +1026,14 @@ class ThreeHelper {
             var arr = this.analyser.getFrequencyData();
             // console.log(arr);
             // 遍历组对象，每个网格子对象设置一个对应的频率数据
-            this.group.children.forEach((elem, index) => {
+            this.groupAnalyser.children.forEach((elem, index) => {
                 elem.scale.y = arr[index] / 80
                 elem.material.color.r = arr[index] / 200;
             });
+        }
+
+        if (this.mixer) {
+            this.mixer.update(this.clock.getDelta());
         }
     }
 
